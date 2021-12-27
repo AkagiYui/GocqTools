@@ -101,6 +101,7 @@ class GocqConnection:
 
             # 群消息
             if message['message_type'] == 'group':
+                result_dict['group_id'] = message['group_id']
                 result_dict['sender']['card'] = message['sender']['card']
                 result_dict['sender']['title'] = message['sender']['title']
             elif message['message_type'] == 'private':
@@ -170,7 +171,7 @@ class GocqApi:
             result = http.post(self.__base_url + api, headers=self.__header, data=data)
         return result.json()
 
-    def send_private_message(self, send_to: str, message: str, auto_escape: bool = False):
+    def send_private_message(self, send_to: int, message: str, auto_escape: bool = False):
         if send_to is None or message is None:
             return
         url = '/send_private_msg'
@@ -181,6 +182,24 @@ class GocqApi:
         }
         result = self.__go_api(url, method=1, data=data)
         return result
+
+    def send_group_message(self, send_to: int, message: str, auto_escape: bool = False):
+        if send_to is None or message is None:
+            return
+        url = '/send_group_msg'
+        data = {
+            'group_id': send_to,
+            'message': message,
+            'auto_escape': auto_escape
+        }
+        result = self.__go_api(url, method=1, data=data)
+        return result
+
+    def send_message(self, msg: dict, auto_escape: bool = False):
+        if 'group_id' in msg.keys():
+            return self.send_group_message(msg['group_id'], msg['message'], auto_escape)
+        else:
+            return self.send_private_message(msg['sender']['user_id'], msg['message'], auto_escape)
 
     def get_login_info(self):
         url = '/get_login_info'

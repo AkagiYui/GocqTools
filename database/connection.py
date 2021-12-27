@@ -5,6 +5,8 @@ from sqlalchemy import Column, String, Integer, Boolean, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+from global_variables import set_global
+
 Base = declarative_base()
 
 
@@ -58,6 +60,9 @@ class Mysql:
         # 创建表结构
         Base.metadata.create_all(engine)
 
+        set_global('db_engine', engine)
+        set_global('db_session', self.__DBSession)
+
         # 防数据库掉线
         self.__keep_db_thread = threading.Thread(
             target=self.__keep_db,
@@ -82,6 +87,6 @@ class Mysql:
                 'access_token': user.access_token
             }
             result.append(new_member)
-
+        session.close()
         self.__gocq_connection = result
         return result
