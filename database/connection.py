@@ -20,6 +20,7 @@ class GocqConnection(Base):
 
 
 class Mysql:
+    __engine = None
     __DBSession = None
     __gocq_connection = []
 
@@ -31,9 +32,15 @@ class Mysql:
             result = session.execute('select 1+1')
             session.close()
             result.close()
-            sleep(5)
+            if self.__go_on:
+                sleep(5)
 
     __keep_db_thread = None
+
+    def close(self):
+        self.__go_on = False
+        # self.__keep_db_thread.join()
+        self.__engine.dispose()
 
     def __del__(self):
         if self.__keep_db_thread.is_alive():
@@ -43,31 +50,31 @@ class Mysql:
                  echo: bool = False, max_connection: int = 10):
         # 连接数据库
         try:
-            connection_string = 'mysql+mysqlconnector://{}:{}@{}:{}/{}?charset=utf8' \
+            connection_string = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8' \
                 .format(username, password, host, port, database)
         except Exception as e:
             raise e
 
-        engine = create_engine(connection_string,
+        self.__engine = create_engine(connection_string,
                                echo=echo,
                                pool_size=max_connection,
                                pool_recycle=3600,
                                pool_timeout=30,
                                pool_pre_ping=True,
                                )
-        self.__DBSession = sessionmaker(bind=engine)
+        self.__DBSession = sessionmaker(bind=self.__engine)
 
         # 创建表结构
-        Base.metadata.create_all(engine)
+        Base.metadata.create_all(self.__engine)
 
-        set_global('db_engine', engine)
+        set_global('db_engine', self.__engine)
         set_global('db_session', self.__DBSession)
 
         # 防数据库掉线
         self.__keep_db_thread = threading.Thread(
             target=self.__keep_db,
             args=(self,),
-            daemon=False,
+            daemon=True,
         )
         self.__keep_db_thread.start()
 

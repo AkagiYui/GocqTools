@@ -1,7 +1,13 @@
 import json
+import random
+import time
+from time import sleep
+
 import requests as http
 import websocket
 import threading
+
+from websocket import WebSocketApp
 
 
 class GocqConnection:
@@ -31,6 +37,9 @@ class GocqConnection:
         'nick_name': '',
     }
 
+    def is_connected(self):
+        return self.__ws_connected
+
     # 根据配置生成url和header
     def __make_url(self):
         # self.__api_url = 'http://{}:{}'.format(self.__host, self.__api_port)
@@ -41,19 +50,29 @@ class GocqConnection:
 
     # 启动ws连接
     def __ws_connect(self):
+        websocket.setdefaulttimeout(10)
+
         self.__ws_connection = websocket.WebSocketApp(
             url=self.__ws_url,
             header=self.__header,
+            on_open=self._event_open,
             on_message=self._event_message,
             on_error=self._event_error,
             on_close=self._event_close,
-            on_open=self._event_open
+            on_ping=self._event_ping,
+            on_pong=self._event_pong,
+            # on_cont_message=self._event_cont_message,
+            # on_data=self._event_data,
         )
 
         self.__ws_thread = threading.Thread(
             target=self.__ws_connection.run_forever,
             daemon=self.__ws_thread_in_daemon,
-            args=()
+            kwargs={
+                'ping_interval': 60,
+                'ping_timeout': 30,
+                'ping_payload': '',
+            }
         )
         self.__ws_thread.start()
 
@@ -64,15 +83,15 @@ class GocqConnection:
 
     # 以下是ws事件方法
     def _event_open(self, _):
+        print(time.asctime(time.localtime(time.time())), 'open')
         self.__ws_connected = True
 
-    def _event_message(self, _, message):
+    def _event_message(self, ws: WebSocketApp, message):
         message = json.loads(message)
 
         if message['post_type'] == 'meta_event':
             if message['meta_event_type'] == 'lifecycle':
                 # 连接成功
-                # self.info['self_id'] = message['self_id']
                 self.info = self.Api.get_login_info()
                 if self.__ws_event_connected:
                     self.__ws_event_connected(self)
@@ -111,10 +130,20 @@ class GocqConnection:
             return
 
     def _event_error(self, ws, error):
+        print(time.asctime(time.localtime(time.time())), error)
         pass
 
-    def _event_close(self, _):
+    def _event_close(self, _, __, ___):
+        print(time.asctime(time.localtime(time.time())), 'close')
         self.__ws_connected = False
+
+    def _event_ping(self, _, message):
+        print(time.asctime(time.localtime(time.time())), 'got ping', message)
+        pass
+
+    def _event_pong(self, _, message: bytes):
+        print(time.asctime(time.localtime(time.time())), 'got pong')
+        pass
 
     def __init__(self,
                  host: str,
@@ -122,6 +151,7 @@ class GocqConnection:
                  api_port: int,
                  access_token: str,
                  auto_connect: bool = False,
+                 daemon: bool = False,
                  on_message: callable = None,
                  on_connected: callable = None
                  ):
@@ -130,6 +160,8 @@ class GocqConnection:
         self.__api_port = api_port
         self.__access_token = access_token
         self.__make_url()
+
+        self.__ws_thread_in_daemon = daemon
 
         self.__ws_event_message = on_message
         self.__ws_event_connected = on_connected
@@ -140,8 +172,9 @@ class GocqConnection:
 
     # 以下是公共方法
     # 启动ws连接
-    def start_connection(self, in_daemon: bool = False):
-        self.__ws_thread_in_daemon = in_daemon
+    def start_connection(self, in_daemon: bool = None):
+        if in_daemon is not None:
+            self.__ws_thread_in_daemon = in_daemon
         self.__ws_connect()
 
     # 关闭ws连接
@@ -180,6 +213,7 @@ class GocqApi:
             'message': message,
             'auto_escape': auto_escape
         }
+        # sleep(random.uniform(0.1, 0.9))
         result = self.__go_api(url, method=1, data=data)
         return result
 
@@ -192,6 +226,7 @@ class GocqApi:
             'message': message,
             'auto_escape': auto_escape
         }
+        sleep(random.uniform(0.5, 1.7))
         result = self.__go_api(url, method=1, data=data)
         return result
 

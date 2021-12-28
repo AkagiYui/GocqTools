@@ -1,6 +1,6 @@
 import random
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, distinct
 from sqlalchemy.ext.declarative import declarative_base
 
 from ay_advance.GocqConnection import GocqConnection
@@ -38,6 +38,8 @@ def enable():
 word_prefix = '我吃啥'
 word_add = ['新增']
 word_del = ['删除']
+word_what = '有啥吃'
+word_what_all = '都有啥吃'
 
 
 def food_add(user_id: int, food: str):
@@ -58,20 +60,53 @@ def food_del(user_id: int, food: str):
     session.close()
 
 
-# 返回 0继续处理 1终止处理
-def main(gocq: GocqConnection, msg):
-    if msg['message'].find(word_prefix) != 0:
-        return 0
-    message = msg['message'][3:]
-    sender = msg['sender']['user_id']
-
+def food_find(user_id: int = None):
     session = db_session()
-    foods = session.query(WoChiSha).filter(WoChiSha.user_id == sender).all()
+    if user_id is None:
+        foods = session.query(distinct(WoChiSha.food)).all()
+    else:
+        foods = session.query(WoChiSha.food).filter(WoChiSha.user_id == user_id).all()
+    session.close()
+
     food_list = []
     for food in foods:
-        food_list.append(food.food)
+        food_list.append(food[0])
     foods = food_list
-    session.close()
+    return foods
+
+
+# 返回 0继续处理 1终止处理
+def main(gocq: GocqConnection, msg):
+    message = msg['message']
+    sender = msg['sender']['user_id']
+
+    if message == word_what:
+        send_msg = ''
+        foods = food_find(sender)
+        if len(foods) != 0:
+            for food in foods:
+                send_msg += f'{food} '
+            send_msg = send_msg[:-1]
+        else:
+            send_msg = '你没吃的...'
+        msg['message'] = send_msg
+        gocq.Api.send_message(msg)
+        return 0
+
+    if message == word_what_all:
+        send_msg = ''
+        foods = food_find()
+        for food in foods:
+            send_msg += f'{food} '
+        msg['message'] = send_msg
+        gocq.Api.send_message(msg)
+        return 0
+
+    if message.find(word_prefix) != 0:
+        return 0
+
+    message = message[3:]
+    foods = food_find(sender)
 
     send_msg = ''
     # 查询

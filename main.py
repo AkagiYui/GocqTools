@@ -1,8 +1,11 @@
 import getopt
 import json
 import logging
+from time import sleep
+
 import colorlog
 import sys
+import signal
 
 from dotenv import dotenv_values
 from ay_advance.AyDict import AyDict
@@ -14,8 +17,8 @@ config_path = './config.json'
 mode_debug = False
 
 MAIN_NAME = 'GocqTools'
-MAIN_VERSION = 1
-MAIN_VERSION_TEXT = '0.0.1'
+MAIN_VERSION = 3
+MAIN_VERSION_TEXT = '0.0.3'
 
 
 def print_help_text():
@@ -26,7 +29,29 @@ def print_help_text():
     print('-d --debug : 输出调试信息')
 
 
+time_to_exit = False
+
+
+def signal_handler(sign, frame):
+    if sign == signal.SIGINT or sign == signal.SIGTERM:
+        global time_to_exit
+        time_to_exit = True
+
+
+def main_exit():
+
+    for conn in connections:
+        conn['main'].stop_connection()
+    database.close()
+    sleep(0.1)
+    logger.info('程序退出，欢迎下次使用')
+    sys.exit(0)
+
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     # 读取启动参数
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'dhc:', ['debug', 'help', 'config='])
@@ -115,6 +140,7 @@ if __name__ == '__main__':
         logger.error('数据库连接失败: %s', e)
         sys.exit(1)
     logger.debug('数据库连接成功')
+    # set_global('db', database)
 
     # 启动路由
     router_init()
@@ -123,14 +149,19 @@ if __name__ == '__main__':
     for connection in connections:
         # if not connection['auto_connect']:
         #     continue
-        connection['connection'] = GocqConnection(
+        connection['main'] = GocqConnection(
             host=connection['host'],
             ws_port=connection['ws_port'],
             api_port=connection['api_port'],
             access_token=connection['access_token'],
+            daemon=True,
             auto_connect=connection['auto_connect'],
             on_message=event_message,
-            on_connected=event_connected
+            on_connected=event_connected,
         )
         # connection['connection'].start_connection(False)
 
+    while True:
+        if time_to_exit:
+            main_exit()
+        sleep(0.5)
