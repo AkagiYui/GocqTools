@@ -1,13 +1,9 @@
 import json
 import random
-import time
 from time import sleep
-
 import requests as http
 import websocket
 import threading
-
-from websocket import WebSocketApp
 
 
 class GocqConnection:
@@ -30,6 +26,7 @@ class GocqConnection:
     __ws_thread = None
     __ws_event_message = None
     __ws_event_connected = None
+    __ws_reconnect = False
 
     # QQ信息
     info = {
@@ -83,10 +80,10 @@ class GocqConnection:
 
     # 以下是ws事件方法
     def _event_open(self, _):
-        print(time.asctime(time.localtime(time.time())), 'open')
+        # print(time.asctime(time.localtime(time.time())), 'open')
         self.__ws_connected = True
 
-    def _event_message(self, ws: WebSocketApp, message):
+    def _event_message(self, _, message):
         message = json.loads(message)
 
         if message['post_type'] == 'meta_event':
@@ -130,19 +127,21 @@ class GocqConnection:
             return
 
     def _event_error(self, ws, error):
-        print(time.asctime(time.localtime(time.time())), error)
+        # print(time.asctime(time.localtime(time.time())), error)
         pass
 
     def _event_close(self, _, __, ___):
-        print(time.asctime(time.localtime(time.time())), 'close')
+        # print(time.asctime(time.localtime(time.time())), 'close')
         self.__ws_connected = False
+        if self.__ws_reconnect:
+            self.__ws_connect()
 
     def _event_ping(self, _, message):
-        print(time.asctime(time.localtime(time.time())), 'got ping', message)
+        # print(time.asctime(time.localtime(time.time())), 'got ping', message)
         pass
 
     def _event_pong(self, _, message: bytes):
-        print(time.asctime(time.localtime(time.time())), 'got pong')
+        # print(time.asctime(time.localtime(time.time())), 'got pong')
         pass
 
     def __init__(self,
@@ -153,7 +152,8 @@ class GocqConnection:
                  auto_connect: bool = False,
                  daemon: bool = False,
                  on_message: callable = None,
-                 on_connected: callable = None
+                 on_connected: callable = None,
+                 auto_reconnect: bool = False,
                  ):
         self.__host = host
         self.__ws_port = ws_port
@@ -161,6 +161,7 @@ class GocqConnection:
         self.__access_token = access_token
         self.__make_url()
 
+        self.__ws_reconnect = auto_reconnect
         self.__ws_thread_in_daemon = daemon
 
         self.__ws_event_message = on_message
@@ -172,7 +173,7 @@ class GocqConnection:
 
     # 以下是公共方法
     # 启动ws连接
-    def start_connection(self, in_daemon: bool = None):
+    def start_connection(self, in_daemon: bool = True):
         if in_daemon is not None:
             self.__ws_thread_in_daemon = in_daemon
         self.__ws_connect()

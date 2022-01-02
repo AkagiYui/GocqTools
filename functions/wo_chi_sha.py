@@ -1,12 +1,10 @@
 import random
-
-from sqlalchemy import Column, Integer, String, distinct
+from sqlalchemy import Column, String, distinct
 from sqlalchemy.ext.declarative import declarative_base
-
-from ay_advance.GocqConnection import GocqConnection
+from ay_advance import GocqConnection
 from global_variables import get_global
 
-logger = get_global('Logger')
+logger = get_global('logger')
 db_engine = get_global('db_engine')
 db_session = get_global('db_session')
 Base = declarative_base()
@@ -23,7 +21,7 @@ class WoChiSha(Base):
 
 def init():
     global logger, db_engine, db_session
-    logger = get_global('Logger')
+    logger = get_global('logger')
     db_engine = get_global('db_engine')
     db_session = get_global('db_session')
 

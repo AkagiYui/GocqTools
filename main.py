@@ -2,23 +2,22 @@ import getopt
 import json
 import logging
 from time import sleep
-
 import colorlog
 import sys
 import signal
-
 from dotenv import dotenv_values
-from ay_advance.AyDict import AyDict
-from database.connection import Mysql
+from ay_advance import AyDict
+from GocqTools import GocqTools
 from router import *
 from global_variables import set_global
 
 config_path = './config.json'
 mode_debug = False
+time_to_exit = False
 
 MAIN_NAME = 'GocqTools'
-MAIN_VERSION = 3
-MAIN_VERSION_TEXT = '0.0.3'
+MAIN_VERSION = 4
+MAIN_VERSION_TEXT = '0.0.4'
 
 
 def print_help_text():
@@ -27,22 +26,18 @@ def print_help_text():
     print('-h --help : 输出本信息')
     print('-c --config : 指定配置文件(默认:./config.json)')
     print('-d --debug : 输出调试信息')
+    print('-v --version : 输出版本信息')
 
 
-time_to_exit = False
-
-
-def signal_handler(sign, frame):
+def signal_handler(sign, _):
     if sign == signal.SIGINT or sign == signal.SIGTERM:
         global time_to_exit
         time_to_exit = True
 
 
-def main_exit():
-
-    for conn in connections:
-        conn['main'].stop_connection()
-    database.close()
+def main_exit(go_cq_tools: GocqTools):
+    go_cq_tools.stop()
+    go_cq_tools.exit()
     sleep(0.1)
     logger.info('程序退出，欢迎下次使用')
     sys.exit(0)
@@ -54,11 +49,14 @@ if __name__ == '__main__':
 
     # 读取启动参数
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'dhc:', ['debug', 'help', 'config='])
+        opts, args = getopt.getopt(sys.argv[1:], 'vdhc:', ['version', 'debug', 'help', 'config='])
     except getopt.GetoptError:
         print('参数错误')
         sys.exit(2)
     for opt, arg in opts:
+        if opt in ('-v', '--version'):
+            print(MAIN_NAME + ' ' + MAIN_VERSION_TEXT)
+            sys.exit(0)
         if opt in ('-h', '--help'):
             print_help_text()
             sys.exit(0)
@@ -66,6 +64,9 @@ if __name__ == '__main__':
             config_path = arg
         if opt in ('-d', '--debug'):
             mode_debug = True
+            set_global('debug', True)
+        else:
+            set_global('debug', False)
 
     # 加载配置文件
     try:
@@ -78,6 +79,8 @@ if __name__ == '__main__':
     except json.decoder.JSONDecodeError as e:
         print('配置文件解析错误')
         sys.exit(1)
+
+    config['debug'] = mode_debug
 
     # 初始化日志
     log_level = config['log.level']
@@ -94,7 +97,7 @@ if __name__ == '__main__':
     else:
         log_level = logging.INFO
 
-    logger = logging.getLogger(MAIN_NAME)
+    logger = logging.getLogger('werkzeug')
     logger.setLevel(log_level)
 
     log_colors_config = {
@@ -115,7 +118,8 @@ if __name__ == '__main__':
     if not logger.handlers:
         logger.addHandler(console_handler)
 
-    set_global('Logger', logger)
+    set_global('console_handler', console_handler)
+    set_global('logger', logger)
     logger.info('%s v%s', MAIN_NAME, MAIN_VERSION_TEXT)
     logger.debug('version: %d', MAIN_VERSION)
 
@@ -126,42 +130,12 @@ if __name__ == '__main__':
         new_value = int(env[key]) if env[key].isdigit() else env[key]
         config[new_key] = new_value
 
-    # 连接数据库
-    try:
-        database = Mysql(
-            host=config['db.host'],
-            port=config['db.port'],
-            database=config['db.database'],
-            username=config['db.username'],
-            password=config['db.password'],
-            echo=False
-        )
-    except Exception as e:
-        logger.error('数据库连接失败: %s', e)
-        sys.exit(1)
-    logger.debug('数据库连接成功')
-    # set_global('db', database)
-
-    # 启动路由
-    router_init()
-
-    connections = database.get_gocq_connections()
-    for connection in connections:
-        # if not connection['auto_connect']:
-        #     continue
-        connection['main'] = GocqConnection(
-            host=connection['host'],
-            ws_port=connection['ws_port'],
-            api_port=connection['api_port'],
-            access_token=connection['access_token'],
-            daemon=True,
-            auto_connect=connection['auto_connect'],
-            on_message=event_message,
-            on_connected=event_connected,
-        )
-        # connection['connection'].start_connection(False)
+    # 启动主程序
+    main = GocqTools(config(), logger)
+    main.init()
+    main.start()
 
     while True:
         if time_to_exit:
-            main_exit()
+            main_exit(main)
         sleep(0.5)

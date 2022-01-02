@@ -1,12 +1,10 @@
 from importlib import import_module
 from types import ModuleType
 from typing import Type
-
-from ay_advance.AyDict import AyDict
-from ay_advance.GocqConnection import GocqConnection
+from ay_advance import GocqConnection
 from global_variables import get_global
 
-logger = get_global('Logger')
+logger = get_global('logger')
 
 # 功能列表
 # status: 0 未加载模块 1 已加载模块
@@ -24,7 +22,7 @@ function_list = [
 
 def router_init():
     global logger
-    logger = get_global('Logger')
+    logger = get_global('logger')
 
     # 加载功能模块
     functions = function_list

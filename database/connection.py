@@ -56,12 +56,12 @@ class Mysql:
             raise e
 
         self.__engine = create_engine(connection_string,
-                               echo=echo,
-                               pool_size=max_connection,
-                               pool_recycle=3600,
-                               pool_timeout=30,
-                               pool_pre_ping=True,
-                               )
+                                      echo=echo,
+                                      pool_size=max_connection,
+                                      pool_recycle=3600,
+                                      pool_timeout=30,
+                                      pool_pre_ping=True,
+                                      )
         self.__DBSession = sessionmaker(bind=self.__engine)
 
         # 创建表结构

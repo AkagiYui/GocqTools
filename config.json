@@ -8,5 +8,15 @@
     "database": "test",
     "username": "test",
     "password": "test"
+  },
+  "web": {
+    "port": 3000,
+    "host": "0.0.0.0",
+    "username": "test1",
+    "password": "test2"
+  },
+  "ws":
+  {
+    "auto_reconnect": true
   }
 }
