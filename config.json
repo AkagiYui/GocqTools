@@ -13,7 +13,8 @@
     "port": 3000,
     "host": "0.0.0.0",
     "username": "test1",
-    "password": "test2"
+    "password": "test2",
+    "secret": "test3"
   },
   "ws":
   {

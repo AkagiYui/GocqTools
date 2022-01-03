@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="position: fixed; width: 100%; overflow: hidden; ">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=1200">
+    <link rel="icon" type="image/x-icon" href="/assets/icon.ico"/>
+    <title>{{ title }}</title>
+{#<!--    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>-->#}
+{#<!--    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">-->#}
+{#<!--    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>-->#}
+{#<!--&lt;!&ndash;    <script src="https://unpkg.com/vue@next"></script>&ndash;&gt;-->#}
+{#<!--    <link href="https://cdn.jsdelivr.net/npm/syzoj-public-cdn@1.0.6/google-fonts/fira-mono.css" rel="stylesheet">-->#}
+{#<!--    <link href="https://cdn.jsdelivr.net/npm/syzoj-public-cdn@1.0.6/google-fonts/lato.css" rel="stylesheet">-->#}
+{#<!--    <link href="https://cdn.jsdelivr.net/npm/syzoj-public-cdn@1.0.6/google-fonts/open-sans.css" rel="stylesheet">-->#}
+{#<!--    <link href="https://cdn.jsdelivr.net/npm/syzoj-public-cdn@1.0.6/google-fonts/exo-2.css" rel="stylesheet">-->#}
+    <script src="https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/fomantic-ui/2.8.8/semantic.min.css">
+    <script src="https://cdn.staticfile.org/fomantic-ui/2.8.8/semantic.js"></script>
+    <link type="text/css" href="https://fonts.loli.net/css?family=Fira%20Mono" rel="stylesheet">
+    <link type="text/css" href="https://fonts.loli.net/css?family=Lato" rel="stylesheet">
+    <link type="text/css" href="https://fonts.loli.net/css?family=Open%20Sans" rel="stylesheet">
+    <link type="text/css" href="https://fonts.loli.net/css?family=Exo%202" rel="stylesheet">
+</head>
+<body style="position: relative; margin-top: 49px; height: calc(100% - 49px); overflow-y: auto; display: grid">
+{#<!--overflow-y: auto 内容溢出时显示滚动条，否则不显示-->#}
+<div class="ui fixed borderless menu" style="position: fixed; height: 49px; ">
+{#<!--    顶部导航栏-->#}
+    <div class="ui container">
+        <a class="header item" href="/"><span style="font-family: 'Exo 2',serif; font-size: 1.5em; font-weight: 600; ">{{ title }}</span></a>
+        <a class="item {% if current == 'index' %}
+            active
+        {% endif %} " href="/"><i class="home icon"></i> 首页</a>
+{#        <a class="item<% if (jwxt.current_title.startsWith('calendar')) { %> active<% } %>" href="/calendar"><i class="calendar icon"></i> 校历</a>#}
+{#        <a class="item<% if (jwxt.current_title.startsWith('timetable')) { %> active<% } %>" href="/timetable"><i class="list icon"></i> 作息时间</a>#}
+        <div class="right menu">
+{#            <% if (user) { %>#}
+{#                <a href="<%= Utils.makeUrl(['user', user.id]) %>" style="color: inherit; ">#}
+{#                    <div class="ui simple dropdown item">#}
+{#                        <%= user.username %><% if (user.nameplate) { %><%- user.nameplate %><% } %> <i class="dropdown icon"></i>#}
+{#                        <div class="menu">#}
+{#                            <a class="item" href="<%= Utils.makeUrl(['user', user.id, 'edit']) %>"><i class="edit icon"></i>修改资料</a>#}
+{#                            <% if (user.is_admin) { %>#}
+{#                                <a class="item" href="<%= Utils.makeUrl(['admin', 'info']) %>"><i class="settings icon"></i>后台管理</a>#}
+{#                                <div class="ui basic modal" id="modal-restart">#}
+{#                                    <div class="ui icon header">#}
+{#                                        <i class="redo icon"></i>#}
+{#                                        <p style="margin-top: 15px; ">重启服务</p>#}
+{#                                    </div>#}
+{#                                    <div class="content" style="text-align: center; ">#}
+{#                                        <p>确认重新启动 JWXT Web 服务吗？</p>#}
+{#                                    </div>#}
+{#                                    <div class="actions">#}
+{#                                        <div class="ui red basic cancel inverted button">#}
+{#                                            <i class="remove icon"></i>#}
+{#                                            否#}
+{#                                        </div>#}
+{#                                        <a class="ui green ok inverted button" href-post="<%= jwxt.utils.makeUrl(['admin', 'restart'], { url: req.query['url'] || req.originalUrl }) %>">#}
+{#                                            <i class="checkmark icon"></i>#}
+{#                                            是#}
+{#                                        </a>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <a class="item" href="#" onclick="$('#modal-restart').modal('show')"><i class="redo icon"></i>重启服务</a>#}
+{#                            <% } %>#}
+{#                            <div class="ui basic modal" id="modal-logout">#}
+{#                                <div class="ui icon header">#}
+{#                                    <i class="flipy question icon"></i>#}
+{#                                    <p style="margin-top: 15px; ">登出</p>#}
+{#                                </div>#}
+{#                                <div class="content" style="text-align: center; ">#}
+{#                                    <p>确认登出吗？</p>#}
+{#                                </div>#}
+{#                                <div class="centered actions">#}
+{#                                    <div class="ui red basic cancel inverted button">#}
+{#                                        <i class="remove icon"></i>#}
+{#                                        否#}
+{#                                    </div>#}
+{#                                    <a class="ui green ok inverted button" href-post="<%= Utils.makeUrl(['admin', 'restart'], { url: req.query['url'] || req.originalUrl }) %>">#}
+{#                                        <i class="checkmark icon"></i>#}
+{#                                        是#}
+{#                                    </a>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                            <a class="item" onclick="$('#modal-logout').modal('show')" href-post="<%= Utils.makeUrl(['logout'], { url: req.originalUrl }) %>"><i class="power icon"></i>登出</a>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </a>#}
+{#            <% } else { %>#}
+                <div class="item">
+                    <a class="ui button" style="margin-right: 0.5em; " href="/login">
+                        登录
+                    </a>
+                </div>
+{#            <% } %>#}
+        </div>
+
+    </div>
+</div>
+<div style="margin-top: 28px; ">
+    <div class="ui main container">

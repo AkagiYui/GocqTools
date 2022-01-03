@@ -2,7 +2,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import Type
 from ay_advance import GocqConnection
-from global_variables import get_global
+from global_variables import get_global, set_global
 
 logger = get_global('logger')
 
@@ -11,6 +11,14 @@ logger = get_global('logger')
 function_list = [
     {
         'name': 'wo_chi_sha',
+        'status': 0,
+        'switch': True,
+        'module': Type[ModuleType],
+        'prefix': '',
+        'suffix': ''
+    },
+    {
+        'name': 'server_info',
         'status': 0,
         'switch': True,
         'module': Type[ModuleType],
@@ -56,7 +64,8 @@ def event_message(conn: GocqConnection, msg: dict):
                     break
 
 
-def event_connected(connection: GocqConnection):
-    nickname = connection.info['nickname']
-    user_id = connection.info['user_id']
+def event_connected(conn: GocqConnection):
+    nickname = conn.info['nickname']
+    user_id = conn.info['user_id']
     logger.info(f'{nickname}({user_id}) - 已连接')
+    set_global(user_id, nickname)

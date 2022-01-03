@@ -90,11 +90,14 @@ class GocqConnection:
             if message['meta_event_type'] == 'lifecycle':
                 # 连接成功
                 self.info = self.Api.get_login_info()
+                self.info['stat'] = self.Api.get_status()['stat']
+                # print(self.info)
                 if self.__ws_event_connected:
                     self.__ws_event_connected(self)
                 return
             elif message['meta_event_type'] == 'heartbeat':
                 # 心跳
+                self.info['stat'] = message['status']['stat']
                 return
 
         # 其他消息
@@ -240,6 +243,12 @@ class GocqApi:
     def get_login_info(self):
         url = '/get_login_info'
         result = self.__go_api(url)
+        return result['data']
+
+    def get_status(self):
+        url = '/get_status'
+        result = self.__go_api(url)
+        # print(result)
         return result['data']
 
 

@@ -1,3 +1,7 @@
+from gevent import monkey
+monkey.patch_all()
+
+import psutil
 import getopt
 import json
 import logging
@@ -16,8 +20,8 @@ mode_debug = False
 time_to_exit = False
 
 MAIN_NAME = 'GocqTools'
-MAIN_VERSION = 4
-MAIN_VERSION_TEXT = '0.0.4'
+MAIN_VERSION = 5
+MAIN_VERSION_TEXT = '0.1.1'
 
 
 def print_help_text():
@@ -130,8 +134,10 @@ if __name__ == '__main__':
         new_value = int(env[key]) if env[key].isdigit() else env[key]
         config[new_key] = new_value
 
+    psutil.cpu_percent()
     # 启动主程序
     main = GocqTools(config(), logger)
+    set_global('main', main)
     main.init()
     main.start()
 
