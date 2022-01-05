@@ -30,15 +30,14 @@ word_prefix = '服务器信息'
 # 返回 0继续处理 1终止处理
 def main(conn: GocqConnection, msg):
     message = msg['message']
-    if message.find(word_prefix) != 0:
+    if message != word_prefix:
         return 0
-    message = message[3:]
-    sender = msg['sender']['user_id']
 
     self_nickname = conn.info['nickname']
     user_id = conn.info['user_id']
     platform_system = platform.system()
-    platform_version = platform.version()
+    # platform_version = platform.version()
+    platform_version = platform.release()
     platform_memory = psutil.virtual_memory()
     platform_memory_usage = 1 - platform_memory.available / platform_memory.total
     platform_memory_usage *= 100
@@ -62,12 +61,12 @@ def main(conn: GocqConnection, msg):
     send_msg += f'收发消息数：{message_received}/{message_sent}\n'
     send_msg += f'操作系统：{platform_system} {platform_version}\n'
     send_msg += f'Python版本：{platform.python_version()}\n'
-    send_msg += f'系统CPU使用率：{psutil.cpu_percent()}%\n'
-    send_msg += f'脚本CPU使用率：{self_process.cpu_percent(1)}%\n'
+    # send_msg += f'系统CPU使用率：{psutil.cpu_percent()}%\n'
+    # send_msg += f'脚本CPU使用率：{self_process.cpu_percent(1)}%\n'
     send_msg += f'系统内存使用率：{platform_memory_usage}%\n'
     send_msg += f'脚本内存使用率：{round(self_process.memory_percent(), 4)}%\n'
     send_msg += f'系统启动时长：{uptime}\n'
-    send_msg += f'脚本运行时长：{uptime2}\n'
+    send_msg += f'脚本运行时长：{uptime2}'
 
     msg['message'] = send_msg
     conn.Api.send_message(msg)

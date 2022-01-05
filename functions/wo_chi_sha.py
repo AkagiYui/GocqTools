@@ -16,6 +16,7 @@ module_version = '0.0.1'
 class WoChiSha(Base):
     __tablename__ = 'wo_chi_sha'
     user_id = Column(String(15), primary_key=True)
+    # group_id = Column(String(15), primary_key=True)
     food = Column(String(255), primary_key=True)
 
 
@@ -89,7 +90,7 @@ def main(gocq: GocqConnection, msg):
             send_msg = '你没吃的...'
         msg['message'] = send_msg
         gocq.Api.send_message(msg)
-        return 0
+        return 1
 
     if message == word_what_all:
         send_msg = ''
@@ -98,7 +99,7 @@ def main(gocq: GocqConnection, msg):
             send_msg += f'{food} '
         msg['message'] = send_msg
         gocq.Api.send_message(msg)
-        return 0
+        return 1
 
     if message.find(word_prefix) != 0:
         return 0

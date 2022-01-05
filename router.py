@@ -14,16 +14,24 @@ function_list = [
         'status': 0,
         'switch': True,
         'module': Type[ModuleType],
-        'prefix': '',
-        'suffix': ''
     },
     {
         'name': 'server_info',
         'status': 0,
         'switch': True,
         'module': Type[ModuleType],
-        'prefix': '',
-        'suffix': ''
+    },
+    {
+        'name': 'zhan_bu',
+        'status': 0,
+        'switch': True,
+        'module': Type[ModuleType],
+    },
+{
+        'name': 'pdf_to_png',
+        'status': 0,
+        'switch': True,
+        'module': Type[ModuleType],
     },
 ]
 
@@ -49,19 +57,26 @@ def router_init():
 def event_message(conn: GocqConnection, msg: dict):
     self_id = conn.info['nickname']
     logger.info(f'{self_id} - {msg}')
-    if msg['post_type'] == 'message':
-        # 遍历调用模块
-        functions = function_list
-        for function in functions:
-            if not function['switch']:
-                continue
-            message = msg['message']
-            module = function['module']
-            if message.find(function['prefix']) == 0 and message.rfind(function['suffix']) == len(message):
-                if module.main(conn, msg) == 0:
-                    continue
-                else:
-                    break
+    # if msg['post_type'] == 'message':
+    #     pass
+    #
+    # elif msg['post_type'] == 'notice':
+    #     pass
+    if 'message' not in msg.keys():
+        msg['message'] = ''
+    call_function(conn, msg)
+
+
+def call_function(conn: GocqConnection, msg: dict):
+    functions = function_list
+    for function in functions:
+        if not function['switch']:
+            continue
+        module = function['module']
+        if module.main(conn, msg) == 0:
+            pass
+        else:
+            break
 
 
 def event_connected(conn: GocqConnection):

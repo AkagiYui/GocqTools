@@ -20,8 +20,8 @@ mode_debug = False
 time_to_exit = False
 
 MAIN_NAME = 'GocqTools'
-MAIN_VERSION = 5
-MAIN_VERSION_TEXT = '0.1.1'
+MAIN_VERSION = 6
+MAIN_VERSION_TEXT = '0.1.5'
 
 
 def print_help_text():
@@ -75,8 +75,9 @@ if __name__ == '__main__':
     # 加载配置文件
     try:
         with open(config_path, 'r') as f:
-            config = json.load(f)
-            config = AyDict(config)
+            conf = json.load(f)
+            conf = AyDict(conf)
+            set_global('config', conf)
     except FileNotFoundError:
         print('配置文件不存在')
         sys.exit(1)
@@ -84,10 +85,10 @@ if __name__ == '__main__':
         print('配置文件解析错误')
         sys.exit(1)
 
-    config['debug'] = mode_debug
+    conf['debug'] = mode_debug
 
     # 初始化日志
-    log_level = config['log.level']
+    log_level = conf['log.level']
     if log_level == 'debug':
         log_level = logging.DEBUG
     elif log_level == 'warning':
@@ -132,11 +133,11 @@ if __name__ == '__main__':
     for key, value in env.items():
         new_key = key.lower().replace('_', '.')
         new_value = int(env[key]) if env[key].isdigit() else env[key]
-        config[new_key] = new_value
+        conf[new_key] = new_value
 
     psutil.cpu_percent()
     # 启动主程序
-    main = GocqTools(config(), logger)
+    main = GocqTools(conf(), logger)
     set_global('main', main)
     main.init()
     main.start()

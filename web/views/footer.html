@@ -1,20 +1,20 @@
 </div>
 <div class="ui vertical footer segment" style="margin-top: 25px;">
     <div class="ui center aligned container" style="position: static; bottom: 1%; width: 100%;">
-        <div style="size: 1em" class="ui active centered inline loader" id="hitokoto-loader"></div>
-        <script>
-            $.get('https://v1.hitokoto.cn/?c=a', function (data) {
-                if (typeof data === 'string') data = JSON.parse(data);
-                $('#hitokoto-loader').removeClass('active');
-                $('#hitokoto-content').css('display', '').text(data.hitokoto);
-                if (data.from) {
-                    $('#hitokoto-from').css('display', '').text('—' + data.from);
-                }
-            });
-        </script>
-        <div style="font-size: 10%; display: none; line-height: 0.1em;" id="hitokoto-content"></div>
-        <div style="font-size: 1%; display: none; margin-top: 3px; color: #666;" id="hitokoto-from"></div>
-        <span style="color: #999;"><a href="https://gitee.com/AkagiYui/jwxt" target="_blank">{{ title }}</a> Powered by <a href="https://akagiyui.com" target="_blank">AkagiYui</a>.</span>
+{#        <div style="size: 1em" class="ui active centered inline loader" id="hitokoto-loader"></div>#}
+{#        <script>#}
+{#            $.get('https://v1.hitokoto.cn/?c=a', function (data) {#}
+{#                if (typeof data === 'string') data = JSON.parse(data);#}
+{#                $('#hitokoto-loader').removeClass('active');#}
+{#                $('#hitokoto-content').css('display', '').text(data.hitokoto);#}
+{#                if (data.from) {#}
+{#                    $('#hitokoto-from').css('display', '').text('—' + data.from);#}
+{#                }#}
+{#            });#}
+{#        </script>#}
+{#        <div style="font-size: 10%; display: none; line-height: 0.1em;" id="hitokoto-content"></div>#}
+{#        <div style="font-size: 1%; display: none; margin-top: 3px; color: #666;" id="hitokoto-from"></div>#}
+        <span style="color: #999;"><a href="https://gitee.com/AkagiYui/GocqTools" target="_blank">{{ title }}</a> Powered by <a href="https://akagiyui.com" target="_blank">AkagiYui</a>.</span>
     </div>
 </div>
 </div>

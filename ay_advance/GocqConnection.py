@@ -1,3 +1,4 @@
+import base64
 import json
 import random
 from time import sleep
@@ -100,6 +101,7 @@ class GocqConnection:
                 self.info['stat'] = message['status']['stat']
                 return
 
+        # print(message)
         # 其他消息
         if not self.__ws_event_message:
             return
@@ -108,6 +110,20 @@ class GocqConnection:
             'post_type': message['post_type'],
             'time': message['time'],
         }
+
+        # 通知事件
+        if message['post_type'] == 'notice':
+            result_dict['notice_type'] = message['notice_type']
+            # 群文件上传
+            if message['notice_type'] == 'group_upload':
+                # result_dict = message
+                result_dict['message'] = ''
+                result_dict['file'] = message['file']
+                result_dict['sender'] = {}
+                result_dict['sender']['user_id'] = message['user_id']
+                result_dict['group_id'] = message['group_id']
+            self.__ws_event_message(self, result_dict)
+            return
 
         if message['post_type'] == 'message':
             result_dict['message_type'] = message['message_type']
@@ -230,7 +246,7 @@ class GocqApi:
             'message': message,
             'auto_escape': auto_escape
         }
-        sleep(random.uniform(0.5, 1.7))
+        sleep(random.uniform(0.1, 0.9))
         result = self.__go_api(url, method=1, data=data)
         return result
 
@@ -260,3 +276,29 @@ class CqCode:
     @staticmethod
     def record(url: str):
         return '[CQ:record,file={}]'.format(url)
+
+    @staticmethod
+    def image(file, image_type: str = 'normal', use_cache: bool = 1, show_id: int = 40000, threads: int = 2):
+        code = '[CQ:image,file='
+        if isinstance(file, str):
+            code += f'{file}'
+        elif isinstance(file, bytes):
+            code += f'base64://{base64.b64encode(file).decode()}'
+        if image_type == 'flash':
+            code += ',type=flash'
+        elif image_type == 'show':
+            code += ',type=show'
+            code += f',id={show_id}'
+        if use_cache == 0:
+            code += ',cache=0'
+        code += f',c={threads}]'
+        return code
+
+    @staticmethod
+    def image_local(file_path: str, image_type: str = 'normal',
+                    use_cache: bool = 1, show_id: int = 40000, threads: int = 2):
+        try:
+            with open(file_path, 'rb') as f:
+                return CqCode.image(f.read(), image_type, use_cache, show_id, threads)
+        except FileExistsError:
+            return CqCode.image('file:///' + file_path, image_type, use_cache, show_id, threads)
