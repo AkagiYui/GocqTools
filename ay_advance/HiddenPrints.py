@@ -1,3 +1,8 @@
+"""
+    暂时重定向输出
+    https://zhuanlan.zhihu.com/p/360137954
+"""
+
 import os
 import sys
 

@@ -1,3 +1,10 @@
+"""
+    用文件头判断文件格式
+    真正的文件格式判断
+    https://blog.csdn.net/privateobject/article/details/78069500
+"""
+
+
 # 用16进制字符串的目的是可以知道文件头是多少字节
 # 各种文件头的长度不一样，少半2字符，长则8字符
 from io import BufferedReader

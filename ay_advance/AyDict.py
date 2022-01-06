@@ -1,7 +1,16 @@
+"""
+    自定义字典类
+    键用半角实心点.做下级入口
+    例 dict['web']['port'] == AyDict['web.port']
+"""
+
+
 class AyDict:
     __dict = {}
 
-    def __init__(self, ori_dict):
+    def __init__(self, ori_dict=None):
+        if ori_dict is None:
+            ori_dict = {}
         self.__dict = ori_dict
 
     def __call__(self):

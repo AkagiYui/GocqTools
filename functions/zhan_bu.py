@@ -89,7 +89,6 @@ def get_omikuji(user_id: str) -> int:
     session.close()
     if found:
         diff = (datetime.now().date() - found.last_time.date()).days
-        print(diff)
         if diff != 0:
             result_id = get_new_omikuji(user_id)
         else:
@@ -99,13 +98,15 @@ def get_omikuji(user_id: str) -> int:
     return result_id
 
 
-def get_explain(omikuji_id: int) -> str:
+def get_explain(omikuji_id: int, only_number: bool = False) -> str:
     omikuji_id = int(omikuji_id)
     if omikuji_id not in range(1, 101):
         return ''
     session = db_session()
     found: TableZhanBu = session.query(TableZhanBu).filter(TableZhanBu.id == omikuji_id).first()
     session.close()
+    if only_number:
+        return found.number
     result = f'【第{found.number}签{found.fortune}】\n\n'
     result += f'{found.text_1}\n{found.explain_1}\n\n'
     result += f'{found.text_2}\n{found.explain_2}\n\n'
@@ -132,7 +133,7 @@ def main(conn: GocqConnection, msg):
     if message == word_for:
         omikuji_id = get_omikuji(sender)
         send_msg = CqCode.image_local(f'./functions/zhan_bu/{omikuji_id}.jpg')
-        msg['message'] = send_msg
+        msg['message'] = f'你抽到了第{get_explain(omikuji_id, True)}签。' + send_msg
         conn.Api.send_message(msg)
         return 1
     elif message == word_hand:

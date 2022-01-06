@@ -20,8 +20,8 @@ mode_debug = False
 time_to_exit = False
 
 MAIN_NAME = 'GocqTools'
-MAIN_VERSION = 6
-MAIN_VERSION_TEXT = '0.1.5'
+MAIN_VERSION = 7
+MAIN_VERSION_TEXT = '0.2.0'
 
 
 def print_help_text():

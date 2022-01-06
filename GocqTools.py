@@ -1,4 +1,7 @@
+import os
 from logging import Logger
+from pathlib import Path
+
 from ay_advance import AyDict, GocqConnection
 from database.connection import Mysql
 from router import router_init, event_message, event_connected
@@ -36,6 +39,8 @@ class GocqTools:
         self.__config = AyDict(config)
 
     def init(self):
+        if not Path('./temp').exists():
+            os.makedirs('./temp')
         self.__web = Web(self.__config, self.__logger)
         self.__ready = True
 
