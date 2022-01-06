@@ -28,7 +28,7 @@
 3. 跑起来
 
    ```shell
-   python3 .\main.py
+   python3 ./main.py
    ```
 4. 访问Web管理页面
 5. 用配置文件里的账号密码登录
