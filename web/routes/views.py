@@ -15,10 +15,14 @@ sys.path.append(path_self)
 path_assets = os.path.join(path_self, 'assets')
 
 
+def is_login():
+    return request.get_cookie('token', secret=config['web.secret']) == get_global('web_username')
+
+
 @app.route('/', ['GET'])
 def api_root():
-    username = request.get_cookie('token', secret=config['web.secret'])
-    if username == get_global('web_username'):
+    # username = request.get_cookie('token', secret=config['web.secret'])
+    if is_login():
         return template('index', template_info)
     else:
         redirect('/login')
@@ -26,6 +30,8 @@ def api_root():
 
 @app.route('/login', ['POST', 'GET'])
 def api_login():
+    if is_login():
+        redirect('/')
     if request.method == 'POST':
         try:
             username = request.json.get('username')
@@ -38,6 +44,7 @@ def api_login():
                 'username': username,
                 'exp': int(time.time()) + 3600 * 24
             }
+            template_info['login'] = True
             return return_content(200, jwt.encode(payload))
         else:
             return return_content(401)
@@ -45,9 +52,13 @@ def api_login():
         return template('login', template_info)
 
 
-@app.route('/logout', ['POST'], auth='t')
+@app.route('/logout', ['GET', 'POST'])
 def api_logout():
-    return return_content(404)
+    if is_login():
+        template_info['login'] = False
+        response.delete_cookie('token')
+    redirect('/')
+    # return return_content(404)
 
 
 @app.route('/assets/<filename:re:.*\.css|.*\.js|.*\.png|.*\.jpg|.*\.gif|.*\.ico>')

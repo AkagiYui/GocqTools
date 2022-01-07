@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from ay_advance import GocqConnection
+from ay_advance import GocqConnection, chinese_to_int
 from ay_advance.GocqConnection import CqCode
 from global_variables import get_global
 import random
-from sqlalchemy import Column, Integer, String, distinct, DateTime
+from sqlalchemy import Column, Integer, String, distinct, DateTime, or_
 from sqlalchemy.ext.declarative import declarative_base
 from ay_advance import GocqConnection
 from global_variables import get_global
@@ -15,7 +15,7 @@ db_session = get_global('db_session')
 Base = declarative_base()
 
 module_name = '占卜'
-module_version = '0.0.1'
+module_version = '0.0.2'
 
 
 class TableZhanBu(Base):
@@ -98,13 +98,18 @@ def get_omikuji(user_id: str) -> int:
     return result_id
 
 
-def get_explain(omikuji_id: int, only_number: bool = False) -> str:
-    omikuji_id = int(omikuji_id)
-    if omikuji_id not in range(1, 101):
-        return ''
+def get_explain(omikuji_id, only_number: bool = False):
     session = db_session()
-    found: TableZhanBu = session.query(TableZhanBu).filter(TableZhanBu.id == omikuji_id).first()
+    found: TableZhanBu = session.query(TableZhanBu)\
+        .filter(or_(TableZhanBu.id == omikuji_id,
+                    TableZhanBu.number == omikuji_id,))\
+        .first()
+    if not found:
+        found: TableZhanBu = session.query(TableZhanBu) \
+            .filter(TableZhanBu.id == chinese_to_int(omikuji_id)).first()
     session.close()
+    if not found:
+        return None
     if only_number:
         return found.number
     result = f'【第{found.number}签{found.fortune}】\n\n'
@@ -149,8 +154,8 @@ def main(conn: GocqConnection, msg):
         # omikuji_id = message.split(' ')[1]
         omikuji_id = message[2:]
         send_msg = get_explain(omikuji_id)
-        if send_msg == '':
-            send_msg = '请输入正确的签号。'
+        if not send_msg:
+            return 0
         msg['message'] = send_msg
         conn.Api.send_message(msg)
         return 1

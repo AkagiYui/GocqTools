@@ -88,8 +88,13 @@
 {#                </a>#}
 {#            <% } else { %>#}
                 <div class="item">
-                    <a class="ui button" style="margin-right: 0.5em; " href="/login">
+                    {% if not login %}
+                        <a class="ui button" style="margin-right: 0.5em; " href="/login">
                         登录
+                    {% else %}
+                        <a class="ui button" style="margin-right: 0.5em; " href="/logout">
+                        退出
+                    {% endif %}
                     </a>
                 </div>
 {#            <% } %>#}

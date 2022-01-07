@@ -23,7 +23,7 @@
                             <label for="password"></label><input name="password" placeholder="密码" type="password" id="password" onkeydown="key_login(event)">
                         </div>
                     </div>
-                    <div class="ui fluid large primary submit button" id="login">登录</div>
+                    <div class="ui fluid large primary submit button" id="login">登 录</div>
                 </div>
 
                 <div class="ui error message"></div>
@@ -31,9 +31,9 @@
             </form>
 
             <div class="ui message">
-<!--                <a href="/sign_up">注册账号</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+{#<!--                <a href="/sign_up">注册账号</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->#}
 {#                <a href="<%= Utils.makeUrl(['forget']) %>">忘记密码</a>#}
-                <p>保留</p>
+                <p>保 留</p>
             </div>
         </div>
     </div>
@@ -50,45 +50,37 @@
         $("#error").show();
     }
     function success(session_id) {
+        {% set login = True %}
         window.location.href = location.protocol + '//' + location.host ;
     }
     function login() {
-        password = md5($("#password").val() + "jwxt_xxx");
         $("#login").addClass("loading");
+        {#alert($("#password").val())#}
         $.ajax({
-            url: "/api/login",
+            url: "/login",
             type: 'POST',
-            data: {
-                "username": $("#username").val(),
-                "password": password
+            headers: {
+                "Content-Type": "application/json"
             },
+            processData: true,
+            data: JSON.stringify({
+                "username": $("#username").val(),
+                "password": $("#password").val(),
+            }),
             async: true,
             success: function(data) {
-                const error_code = data.error_code;
-                switch (error_code) {
-                    case 1001:
-                        show_error("用户不存在");
-                        break;
-                    case 1002:
-                        show_error("密码错误");
-                        break;
-                    case 1003:
-                        show_error("您尚未设置密码，请通过下方「找回密码」来设置您的密码。");
-                        break;
-                    case 1:
-                        success(data.session_id);
-                        return;
-                    default:
-                        show_error("未知错误");
-                        break;
-                }
-                $("#login").text("登录");
+                success(data.data);
+                $("#login").text("登 录");
                 $("#login").removeClass("loading");
             },
             error:  function(XMLHttpRequest, textStatus, errorThrown) {
-                alert(XMLHttpRequest.responseText);
-                show_error("未知错误");
-                $("#login").text("登录");
+                if (XMLHttpRequest.status === 401) {
+                    show_error("认证错误");
+                } else {
+                    show_error("未知错误 " + XMLHttpRequest.responseText);
+                }
+                $("#login").text("登 录");
+                $("#login").removeClass("loading");
             }
         });
     }

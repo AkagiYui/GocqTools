@@ -32,7 +32,7 @@ def del_surplus_unit(x):
     return x
 
 
-def int_to_Chinese(integer: int) -> str:
+def int_to_chinese(integer: int) -> str:
     # 数字转汉字列表
     integer = list(str(integer))
     for i in integer:

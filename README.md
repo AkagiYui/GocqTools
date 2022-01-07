@@ -18,7 +18,7 @@
 1. 一些库的安装
 
    ```shell
-   pip3 install wheel gevent psutil colorlog python-dotenv requests websocket-client sqlalchemy bottle jwt paste pymysql jinja2 PyMuPDF
+   pip3 install wheel gevent psutil colorlog python-dotenv requests websocket-client sqlalchemy bottle pyjwt paste pymysql jinja2 PyMuPDF
    ```
 2. 你需要修改配置文件 `config.json`
 
@@ -47,13 +47,13 @@
 
 技术栈 `SQLAlchemy` `bottle` `paste` `jinja2`
 
-代码ToDo List
+###### 代码ToDo List
 
 - [X]  `.env`覆盖 `config.json`
 - [ ]  Web管理
 - [ ]  功能分号管理
 
-功能ToDo List
+###### 功能ToDo List
 
 - [X]  我吃啥
 - [X]  服务器信息
@@ -68,6 +68,16 @@
 ---
 
 # 更新日志
+
+## 0.2.1 `2022-01-07`
+
+✨ 新增Web端登录/退出功能
+
+⬆️ 优化`占卜` 支持中文解签`解签二十三`
+
+✨ 新增自定义功能 两个汉字转数字函数 `chinese_to_int` `chinese_to_int_e`
+
+🔄 自定义功能 函数`int_to_Chinese`改名为`int_to_chinese`
 
 ## 0.2.0 `2022-01-06`
 
