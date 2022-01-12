@@ -86,8 +86,9 @@ class GocqConnection:
 
     def _event_message(self, _, message):
         message = json.loads(message)
-
+        # 元事件
         if message['post_type'] == 'meta_event':
+            # go-cqhttp生命周期事件
             if message['meta_event_type'] == 'lifecycle':
                 # 连接成功
                 self.info = self.Api.get_login_info()
@@ -103,6 +104,7 @@ class GocqConnection:
 
         # print(message)
         # 其他消息
+        # 没有配置消息回调，直接返回
         if not self.__ws_event_message:
             return
         result_dict = {
@@ -125,6 +127,7 @@ class GocqConnection:
             self.__ws_event_message(self, result_dict)
             return
 
+        # 消息事件
         if message['post_type'] == 'message':
             result_dict['message_type'] = message['message_type']
             result_dict['message'] = message['message']
@@ -139,6 +142,7 @@ class GocqConnection:
                 result_dict['group_id'] = message['group_id']
                 result_dict['sender']['card'] = message['sender']['card']
                 result_dict['sender']['title'] = message['sender']['title']
+                result_dict['sender']['role'] = message['sender']['role']
             elif message['message_type'] == 'private':
                 pass
 
@@ -274,10 +278,6 @@ class CqCode:
         return '[CQ:face,id={}]'.format(face_id)
 
     @staticmethod
-    def record(url: str):
-        return '[CQ:record,file={}]'.format(url)
-
-    @staticmethod
     def image(file, image_type: str = 'normal', use_cache: bool = 1, show_id: int = 40000, threads: int = 2):
         code = '[CQ:image,file='
         if isinstance(file, str):
@@ -302,3 +302,29 @@ class CqCode:
                 return CqCode.image(f.read(), image_type, use_cache, show_id, threads)
         except FileExistsError:
             return CqCode.image('file:///' + file_path, image_type, use_cache, show_id, threads)
+
+    # [CQ:at,qq=10001000]
+    @staticmethod
+    def at(user_id):
+        return f'[CQ:at,qq={user_id}]'
+
+    # [CQ:record,file=http://baidu.com/1.mp3]
+    @staticmethod
+    def record(file, use_cache: bool = 1):
+        code = '[CQ:record,file='
+        if isinstance(file, str):
+            code += f'{file}'
+        elif isinstance(file, bytes):
+            code += f'base64://{base64.b64encode(file).decode()}'
+        if use_cache == 0:
+            code += ',cache=0'
+        code += ']'
+        return code
+
+    @staticmethod
+    def record_local(file_path: str, use_cache: bool = 1):
+        try:
+            with open(file_path, 'rb') as f:
+                return CqCode.record(f.read(), use_cache)
+        except FileExistsError:
+            return CqCode.record('file:///' + file_path, use_cache)

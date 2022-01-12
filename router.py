@@ -2,6 +2,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import Type
 from ay_advance import GocqConnection
+from ay_advance.GocqConnection import CqCode
 from global_variables import get_global, set_global
 
 logger = get_global('logger')
@@ -64,6 +65,10 @@ def event_message(conn: GocqConnection, msg: dict):
     #     pass
     if 'message' not in msg.keys():
         msg['message'] = ''
+    if msg['message'].strip() == CqCode.at(conn.info['user_id']):
+        msg['message'] = '干嘛'
+        conn.Api.send_message(msg)
+        return
     call_function(conn, msg)
 
 

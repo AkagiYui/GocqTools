@@ -12,7 +12,8 @@ app = get_global('app')
 jwt = get_global('jwt')
 path_self = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append(path_self)
-path_assets = os.path.join(path_self, 'assets')
+parent_path = os.path.dirname(path_self)
+path_assets = os.path.join(parent_path, 'assets')
 
 
 def is_login():

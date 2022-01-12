@@ -8,6 +8,7 @@ from ay_advance.get_file_format import get_file_format  # 函数 获取文件格
 from ay_advance.int_to_chinese import int_to_chinese  # 函数 数字转中文
 from ay_advance.tool_functions import chinese_to_int  # 函数 中文转数字
 from ay_advance.tool_functions import chinese_to_int_e  # 函数 中文转数字
+from ay_advance.AyStr import AyStr  # 类 自定义字符串
 
 
 # 测试

@@ -1,4 +1,5 @@
 import os
+import sys
 from logging import Logger
 from pathlib import Path
 
@@ -80,6 +81,7 @@ class GocqTools:
             )
         except Exception as e:
             self.__logger.error('数据库连接失败: %s', e)
+            exit(1)
 
         self.__database = database
         self.__logger.debug('数据库连接成功')
@@ -87,10 +89,9 @@ class GocqTools:
     def __start_web(self):
         try:
             self.__web.start()
+            self.__logger.debug('web启动成功')
         except Exception as e:
             self.__logger.error(f'web启动失败: {e}')
-        finally:
-            self.__logger.debug('web启动成功')
 
     def __start_websocket(self):
         connections = self.__database.get_gocq_connections()

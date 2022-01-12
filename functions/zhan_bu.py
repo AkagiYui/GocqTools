@@ -15,7 +15,7 @@ db_session = get_global('db_session')
 Base = declarative_base()
 
 module_name = '占卜'
-module_version = '0.0.2'
+module_version = '0.0.3'
 
 
 class TableZhanBu(Base):
@@ -133,20 +133,31 @@ notice_1 = '注：你抽中了凶签。\n相传抽中凶签后，将签就近挂
 
 # 返回 0继续处理 1终止处理
 def main(conn: GocqConnection, msg):
-    message = msg['message']
+    message: str = msg['message']
     sender = msg['sender']['user_id']
-    if message == word_for:
+    if message.strip() == word_for:
         omikuji_id = get_omikuji(sender)
         send_msg = CqCode.image_local(f'./functions/zhan_bu/{omikuji_id}.jpg')
         msg['message'] = f'你抽到了第{get_explain(omikuji_id, True)}签。' + send_msg
         conn.Api.send_message(msg)
         return 1
-    elif message == word_hand:
+    elif message.strip() == word_hand:
         today = get_today_omikuji(sender)
         if not today:
             send_msg = '你今天还没有求签。'
         else:
             send_msg = '你已将签挂起。'
+        msg['message'] = send_msg
+        conn.Api.send_message(msg)
+        return 1
+    elif message.strip() == word_explain:
+        today = get_today_omikuji(sender)
+        if not today:
+            send_msg = '你今天还没有求签。'
+        else:
+            send_msg = get_explain(today)
+            if not send_msg:
+                return 0
         msg['message'] = send_msg
         conn.Api.send_message(msg)
         return 1
