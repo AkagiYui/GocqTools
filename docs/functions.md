@@ -121,6 +121,15 @@
 
 群里有人上传midi文件或有人触发指定关键词时会转换成语音
 
+要求：安装`ffmpeg`与`fluidsynth`
+
+下载音色库，放置于`functions/midi_to_record`目录下：
+
+0. [SalamanderC5Light2.sf2](https://sites.google.com/view/hed-sounds/salamander-c5-light)
+
+1. [MuseScore_General.sf2](ftp://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General.sf2)
+
+
 说明详见[TextToMidi.py](../ay_advance/TextToMidi.py)
 
 > 格式：多行文本，包括参数行与音符行。行内出现参数时则视为参数行，不解析音符。
