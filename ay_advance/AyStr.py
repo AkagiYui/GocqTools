@@ -3,6 +3,7 @@
     重写in支持判断列表或元组成员是否出现在字符串里
     重写find()支持查找子串列表或元组
 """
+from typing import Union
 
 
 class AyStr(str):
@@ -13,7 +14,7 @@ class AyStr(str):
             return len([member for member in item if member in self]) > 0
         return super().__contains__(item)
 
-    def find(self, __sub: list | tuple | str, __start=None, __end=None) -> list | tuple | int:
+    def find(self, __sub: Union[list, tuple, str], __start=None, __end=None) -> Union[list, tuple, int]:
         if isinstance(__sub, list):
             result = []
             for i in __sub:
@@ -26,7 +27,7 @@ class AyStr(str):
             return result
         return super().find(__sub, __start, __end)
 
-    def startswith(self, __prefix: list | tuple | str, __start=None, __end=None) -> bool:
+    def startswith(self, __prefix: Union[list, tuple, str], __start=None, __end=None) -> bool:
         if isinstance(__prefix, list or tuple):
             for i in __prefix:
                 if super().startswith(i, __start, __end):

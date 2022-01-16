@@ -12,63 +12,91 @@
 
 ---
 
-## 食用方法
+## 使用方法
 
 0. 确保你的Python版本大于等于 `3.8.0`
-1. 一些库的安装
+   ```shell
+   python3 --version
+   ```
+   
+1. 一些依赖的安装
+   ```shell
+   sudo apt install ffmpeg fluidsynth
+   ```
+   以上仅为我测试环境debian系统的安装方法
+
+   根据自己的系统让环境变量里有ffmpeg与fluidsynth即可
 
    ```shell
-   pip3 install wheel gevent psutil colorlog python-dotenv requests websocket-client sqlalchemy bottle pyjwt paste pymysql jinja2 PyMuPDF
+   python3 -m pip install wheel distro gevent psutil colorlog python-dotenv requests websocket-client sqlalchemy bottle pyjwt paste pymysql jinja2 PyMuPDF
    ```
+   
 2. 你需要修改配置文件 `config.json`
 
    配置文件中已列出了所有目前可用的配置项
 
-   你需要修改数据库配置和Web端口
+   你需要修改数据库配置和Web端口(数据库要结构我还没说明...)
+
 3. 跑起来
 
    ```shell
    python3 ./main.py
    ```
+   
 4. 访问Web管理页面
+
 5. 用配置文件里的账号密码登录
 
 ---
 
 ## 一些说明
 
-这是一个耦合度很高的结构体系
+这是一个耦合度不低的结构体系
 里面有已经写好的功能
 
 当然你也可以自己写新功能
-但是我感觉挺不友好的
-
-`占卜`数据库文件：`zhan_bu.sql` 请自行导入
+但是我感觉现阶段挺不友好的
 
 用到了 `SQLAlchemy` `bottle` `paste` `jinja2`
 
-###### 代码ToDo List
+###### 代码TODO List
 
 - [X]  `.env`覆盖 `config.json`
 - [ ]  Web管理
 - [ ]  功能分号管理
+- [ ]  解决文件过大导致base64过长
 
-###### 功能ToDo List
+###### 功能TODO List
 
 - [X]  我吃啥
 - [X]  服务器信息
 - [X]  占卜
 - [X]  PDF转PNG
+- [x]  Midi转语音
 - [ ]  是什么
 
+已完成的功能说明可以查看[功能说明](docs/functions.md)
+
 目前想不到有什么要做的
-有需要的话可以提issue
+
+有需要的话可以提issue(其实我不太会用issue，强迫自己用以达到学习的目的)
 
 注意：Web页面未做任何安全措施，请勿随意暴露端口至公网
 
 ---
 
 # 更新日志
+
+## 0.3.0 `2022-01-16`
+
+`U` 更新`服务器信息`支持显示Linux发行版
+
+`A` 新增自定义功能 `文本转Midi`类
+
+`A` 新增功能`Midi转语音`
+> `S` 演奏1155665-4433221-
+> 
+> `R` `小星星语音`
 
 ## 0.2.5 `2022-01-13`
 

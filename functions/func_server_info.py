@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 import platform
-import random
+import distro
 
 import psutil
 
@@ -11,7 +11,7 @@ from global_variables import get_global
 logger = get_global('logger')
 
 module_name = '服务器信息'
-module_version = '0.0.1'
+module_version = '0.0.2'
 
 
 def init():
@@ -35,9 +35,13 @@ def main(conn: GocqConnection, msg):
 
     self_nickname = conn.info['nickname']
     user_id = conn.info['user_id']
-    platform_system = platform.system()
-    # platform_version = platform.version()
-    platform_version = platform.release()
+    if platform.system().strip() == 'Windows':
+        platform_system = 'Windows'
+        platform_version = platform.version()
+    else:
+        platform_system = distro.name(True)
+        platform_version = ''
+        # platform_version = platform.release()
     platform_memory = psutil.virtual_memory()
     platform_memory_usage = 1 - platform_memory.available / platform_memory.total
     platform_memory_usage *= 100

@@ -7,6 +7,8 @@
     ⑥群聊 吃啥删除 → 管理员可删除群内食物
 """
 import random
+from typing import Union
+
 from sqlalchemy import Column, String, distinct
 from sqlalchemy.ext.declarative import declarative_base
 from ay_advance import GocqConnection, AyStr
@@ -42,7 +44,7 @@ def enable():
     logger.debug(f'{module_name}({module_version}) 被启动了')
 
 
-def food_add(food: str | list[str], user_id: str, group_id: str = ''):
+def food_add(food: Union[str, list[str]], user_id: str, group_id: str = ''):
     session = db_session()
     tmp_list = []
     if isinstance(food, str):
@@ -60,7 +62,7 @@ def food_add(food: str | list[str], user_id: str, group_id: str = ''):
     session.close()
 
 
-def food_del(food: str | list[str], user_id: str = None, group_id: str = None):
+def food_del(food: Union[str, list[str]], user_id: str = None, group_id: str = None):
     session = db_session()
     tmp_list = []
     if isinstance(food, str):
@@ -138,6 +140,8 @@ OP_ALL = 3
 
 # 返回 0继续处理 1终止处理
 def main(gocq: GocqConnection, msg):
+    if msg['post_type'] != 'message':
+        return 0
     message: AyStr = AyStr(msg['message'].strip()).replace_all('  ', ' ')  # 消息
     user_id = msg['sender']['user_id']  # 发送者QQ
     group_id = ''  # 发送者群号

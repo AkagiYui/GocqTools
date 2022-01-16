@@ -25,7 +25,7 @@ def enable():
 
 # 返回 0继续处理 1终止处理
 def main(conn: GocqConnection, msg):
-    limit_pages = 10
+    limit_pages = 5
     limit_size = 100
     zoom_times = 5
 
@@ -47,13 +47,13 @@ def main(conn: GocqConnection, msg):
         send_msg = f'文件类型：{file_type}，取消处理'
     else:
         import fitz
-        temp_name = ''.join(random.sample('zyxwvutsrqponmlkjihgfedcba', 16))
+        temp_name = ''.join(random.sample('zyxwvutsrqponmlkjihgfedcba9876543210', 16))
         temp_name = './temp/' + temp_name
         with open(temp_name, 'wb') as f:
             f.write(file_content)
         with fitz.open(temp_name) as pdf:
             page_count = pdf.page_count
-            send_msg = f'{file_name}(共{page_count}页)\n预览：'
+            send_msg = f'{file_name}(共{page_count}页) 预览\n'
             logger.debug(f'{file_name}(共{page_count}页)')
             if page_count > limit_pages:
                 page_count = limit_pages

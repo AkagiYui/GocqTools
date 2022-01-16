@@ -9,7 +9,7 @@ from ay_advance.int_to_chinese import int_to_chinese  # 函数 数字转中文
 from ay_advance.tool_functions import chinese_to_int  # 函数 中文转数字
 from ay_advance.tool_functions import chinese_to_int_e  # 函数 中文转数字
 from ay_advance.AyStr import AyStr  # 类 自定义字符串
-
+from ay_advance.TextToMidi import TextToMidi  # 类 文本转Midi
 
 # 测试
 if __name__ == '__main__':
