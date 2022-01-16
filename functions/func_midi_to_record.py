@@ -31,10 +31,17 @@ def make_filename():
 
 
 def midi_to_audio(midi_file: str, audio_file: str, soundfont: int = 0, gain: float = 0.2):
-    if soundfont == 1:
-        filename_soundfont = './functions/midi_to_record/MuseScore_General.sf2'
-    else:
-        filename_soundfont = './functions/midi_to_record/SalC5Light2.sf2'
+    soundfont_list = [
+        'SalC5Light2.sf2',
+        'MuseScore_General.sf2',
+    ]
+
+    try:
+        filename_soundfont = soundfont_list[soundfont]
+    except IndexError:
+        filename_soundfont = soundfont_list[0]
+    filename_soundfont = './functions/midi_to_record/' + filename_soundfont
+
     cmd_list = [
         'fluidsynth',
         '-ni',
