@@ -28,8 +28,14 @@ function_list = [
         'switch': True,
         'module': Type[ModuleType],
     },
-{
+    {
         'name': 'pdf_to_png',
+        'status': 0,
+        'switch': True,
+        'module': Type[ModuleType],
+    },
+{
+        'name': 'midi_to_record',
         'status': 0,
         'switch': True,
         'module': Type[ModuleType],
@@ -45,7 +51,7 @@ def router_init():
     functions = function_list
     for function in functions:
         func_name = function['name']
-        module = import_module(f'functions.{func_name}')
+        module = import_module(f'functions.func_{func_name}')
         function['module'] = module
         module.init()
         function['status'] = 1
@@ -78,6 +84,7 @@ def call_function(conn: GocqConnection, msg: dict):
         if not function['switch']:
             continue
         module = function['module']
+        # logger.debug(f'call {module.module_name}')
         if module.main(conn, msg) == 0:
             pass
         else:
