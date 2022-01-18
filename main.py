@@ -21,7 +21,7 @@ time_to_exit = False
 
 MAIN_NAME = 'GocqTools'
 MAIN_VERSION = 12
-MAIN_VERSION_TEXT = '0.3.2'
+MAIN_VERSION_TEXT = '0.3.3'
 
 
 def print_help_text():
