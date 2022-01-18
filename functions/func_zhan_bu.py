@@ -1,10 +1,8 @@
 from datetime import datetime
-
-from ay_advance import GocqConnection, chinese_to_int
+from ay_advance import chinese_to_int
 from ay_advance.GocqConnection import CqCode
-from global_variables import get_global
 import random
-from sqlalchemy import Column, Integer, String, distinct, DateTime, or_
+from sqlalchemy import Column, Integer, String, DateTime, or_
 from sqlalchemy.ext.declarative import declarative_base
 from ay_advance import GocqConnection
 from global_variables import get_global

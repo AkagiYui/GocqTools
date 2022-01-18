@@ -1,4 +1,5 @@
 import base64
+import html
 import json
 import random
 from time import sleep
@@ -129,6 +130,8 @@ class GocqConnection:
 
         # 消息事件
         if message['post_type'] == 'message':
+            message['message'] = html.unescape(message['message'])
+
             result_dict['message_type'] = message['message_type']
             result_dict['message'] = message['message']
             result_dict['message_id'] = message['message_id']
@@ -237,7 +240,6 @@ class GocqApi:
             'message': message,
             'auto_escape': auto_escape
         }
-        # sleep(random.uniform(0.1, 0.9))
         result = self.__go_api(url, method=1, data=data)
         return result
 
@@ -250,7 +252,7 @@ class GocqApi:
             'message': message,
             'auto_escape': auto_escape
         }
-        sleep(random.uniform(0.1, 0.9))
+        # sleep(random.uniform(0.1, 0.9))
         result = self.__go_api(url, method=1, data=data)
         return result
 

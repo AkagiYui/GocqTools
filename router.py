@@ -34,8 +34,14 @@ function_list = [
         'switch': True,
         'module': Type[ModuleType],
     },
-{
+    {
         'name': 'midi_to_record',
+        'status': 0,
+        'switch': True,
+        'module': Type[ModuleType],
+    },
+    {
+        'name': 'auto_face',
         'status': 0,
         'switch': True,
         'module': Type[ModuleType],
@@ -51,7 +57,11 @@ def router_init():
     functions = function_list
     for function in functions:
         func_name = function['name']
-        module = import_module(f'functions.func_{func_name}')
+        try:
+            module = import_module(f'functions.func_{func_name}')
+        except ModuleNotFoundError:
+            logger.warning(f'{func_name} - 模块未找到')
+            continue
         function['module'] = module
         module.init()
         function['status'] = 1
@@ -82,6 +92,8 @@ def call_function(conn: GocqConnection, msg: dict):
     functions = function_list
     for function in functions:
         if not function['switch']:
+            continue
+        if function['status'] != 1:
             continue
         module = function['module']
         # logger.debug(f'call {module.module_name}')
