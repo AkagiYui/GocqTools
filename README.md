@@ -4,7 +4,7 @@
 
 立项日期: 2021-12-26
 
-自己玩玩，学习Python用的
+主要是自己玩玩，以学习Python为目的写的这个项目
 
 如果有更高级的需求，欢迎使用NoneBot :)
 
@@ -30,7 +30,7 @@
    根据自己的系统让环境变量里有ffmpeg与fluidsynth即可
 
    ```shell
-   python3 -m pip install wheel distro gevent psutil colorlog python-dotenv requests websocket-client sqlalchemy bottle pyjwt paste pymysql jinja2 PyMuPDF
+   python3 -m pip install wheel distro gevent psutil colorlog python-dotenv requests websocket-client sqlalchemy bottle pyjwt paste pymysql jinja2 PyMuPDF mido
    ```
    
 2. 你需要修改配置文件 `config.json`
@@ -74,16 +74,15 @@
 - [X]  服务器信息
 - [X]  占卜
 - [X]  PDF转PNG
-- [x]  Midi转语音
+- [x]  midi转语音
 - [ ]  是什么
 - [ ]  部落战争信息
 - [ ]  昨日群词云
 - [ ]  自动表情包
 - [ ]  词库
+- [ ]  DOC/XLS/PPT转PNG
 
 已完成的功能说明可以查看[功能说明](docs/functions.md)
-
-目前想不到有什么要做的
 
 有需要的话可以提issue(其实我不太会用issue，强迫自己用以达到学习的目的)
 
@@ -92,6 +91,12 @@
 ---
 
 # 更新日志
+
+## 0.3.4 `2022-01-19`
+
+`U` 压缩`midi转语音`输出的音频文件
+
+`U` 修复`midi转语音`在Linux系统下midi文件转音频失败的问题
 
 ## 0.3.3 `2022-01-18`
 

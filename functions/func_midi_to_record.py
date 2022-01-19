@@ -1,6 +1,7 @@
 import os
 import random
 import subprocess
+import platform
 
 import requests
 
@@ -11,7 +12,9 @@ from global_variables import get_global
 logger = get_global('logger')
 
 module_name = 'midi转语音'
-module_version = '0.0.1'
+module_version = '0.0.2'
+
+run_in_shell = platform.system().strip().lower().startswith('win')
 
 
 def init():
@@ -53,7 +56,7 @@ def midi_to_audio(midi_file: str, audio_file: str, soundfont: int = 0, gain: flo
         str(gain)
     ]
     ret = subprocess.call(cmd_list,
-                          shell=True,
+                          shell=run_in_shell,
                           cwd=os.getcwd(),
                           stdout=open(os.devnull, 'w'),
                           stderr=subprocess.STDOUT)
@@ -63,7 +66,7 @@ def midi_to_audio(midi_file: str, audio_file: str, soundfont: int = 0, gain: flo
 def audio_to_mp3(audio_file: str, mp3_file: str):
     cmd_list = ['ffmpeg', '-i', audio_file, mp3_file]
     ret = subprocess.call(cmd_list,
-                          shell=True,
+                          shell=run_in_shell,
                           cwd=os.getcwd(),
                           stdout=open(os.devnull, 'w'),
                           stderr=subprocess.STDOUT)
@@ -89,19 +92,19 @@ def main(conn: GocqConnection, msg):
             file_content: bytes = requests.get(file_url).content
             filename_base = make_filename()
             filename_midi = filename_base + '.mid'
-            filename_audio = filename_base + '.wav'
+            filename_wav = filename_base + '.wav'
             filename_mp3 = filename_base + '.mp3'
             with open(filename_midi, 'wb') as f:
                 f.write(file_content)
-            if midi_to_audio(filename_midi, filename_audio, 1, 0.2):
-                if audio_to_mp3(filename_audio, filename_mp3):
+            if midi_to_audio(filename_midi, filename_wav, 1, 0.2):
+                if audio_to_mp3(filename_wav, filename_mp3):
                     send_msg = CqCode.record_local(filename_mp3)
                     os.remove(filename_mp3)
                 else:
-                    send_msg = 'Midi转语音：音频压缩失败.'
-                os.remove(filename_audio)
+                    send_msg = 'mdi转语音：音频压缩失败.'
+                os.remove(filename_wav)
             else:
-                send_msg = 'Midi转语音：Midi渲染失败.'
+                send_msg = 'midi转语音：渲染失败.'
             os.remove(filename_midi)
         else:
             return 0
@@ -118,17 +121,22 @@ def main(conn: GocqConnection, msg):
         if midd.get_length():
             filename_base = make_filename()
             filename_midi = filename_base + '.mid'
-            filename_audio = filename_base + '.flac'
+            filename_wav = filename_base + '.wav'
+            filename_mp3 = filename_base + '.mp3'
             midd.save(filename_midi)
 
-            if midi_to_audio(filename_midi, filename_audio, 0, 0.7):
-                send_msg = CqCode.record_local(filename_audio)
-                os.remove(filename_audio)
+            if midi_to_audio(filename_midi, filename_wav, 0, 0.7):
+                if audio_to_mp3(filename_wav, filename_mp3):
+                    send_msg = CqCode.record_local(filename_mp3)
+                    os.remove(filename_mp3)
+                else:
+                    send_msg = 'midi文本转语音：音频压缩失败.'
+                os.remove(filename_wav)
             else:
-                send_msg = '渲染失败.'
+                send_msg = 'midi文本转语音：渲染失败.'
             os.remove(filename_midi)
         else:
-            send_msg = '渲染失败:音频长度为0.'
+            send_msg = 'midi文本转语音：音频长度为0.'
     else:
         return 0
 
