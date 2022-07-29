@@ -1,3 +1,7 @@
+# ! 停止维护 !
+
+该项目已停止维护，请转至新项目 [**KenkoGoServer**](https://github.com/AkagiYui/KenkoGoServer)
+
 # GocqTools
 
 #### 一个管理Go-cqhttp的工具
